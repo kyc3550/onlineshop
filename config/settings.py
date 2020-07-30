@@ -86,7 +86,7 @@ pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST' : 'onlineshop.cij5ghvum37f.ap-northeast-2.rds.amazonaws.com',
+        'HOST' : 'mythirdprj-onlineshop.cij5ghvum37f.ap-northeast-2.rds.amazonaws.com',
         'NAME':'onlineshop',
         'USER' : 'kyc',
         'PASSWORD' : 'asd123123',
