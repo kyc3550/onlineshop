@@ -46,8 +46,8 @@ class OrderItem(models.Model):
 from .iamport import payments_prepare, find_transaction
 import hashlib
 
-class OrderTransactionManager(models.Managet):
-    def create_new(slef, order, amount, success=None, transaction_status=None):
+class OrderTransactionManager(models.Manager):
+    def create_new(self, order, amount, success=None, transaction_status=None):
         if not order:
             raise ValueError("주문 정보 오류")
         
@@ -60,7 +60,7 @@ class OrderTransactionManager(models.Managet):
         payments_prepare(merchant_order_id, amount)
         transaction = self.model(
             order=order,
-            merchant_order_id=merchant_order_id
+            merchant_order_id=merchant_order_id,
             amount=amount
         )
 
@@ -83,7 +83,7 @@ class OrderTransactionManager(models.Managet):
                 return None
 
 class OrderTransaction(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASECADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     merchant_order_id = models.CharField(max_length=120, null=True, blank=True)
     transaction_id = models.CharField(max_length=120, null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -99,15 +99,20 @@ class OrderTransaction(models.Model):
     class Meta:
         ordering = ['-created']
 
+def order_payment_validation(sender, instance, created, *args, **kwargs):
+    if instance.transaction_id:
+        import_transaction = OrderTransaction.objects.get_transaction(merchant_order_id=instance.merchant_order_id)
+        merchant_order_id = import_transaction['merchant_order_id']
+        imp_id = import_transaction['imp_id']
+        amount = import_transaction['amount']
 
+        local_transaction = OrderTransaction.objects.filter(merchant_order_id = merchant_order_id, transaction_id = imp_id,amount = amount).exists()
 
-
-
-
-
-
-
-
+        if not import_transaction or not local_transaction:
+            raise ValueError("비정상 거래입니다.")
+        
+from django.db.models.signals import post_save
+post_save.connect(order_payment_validation,sender=OrderTransaction)
 
 
 
