@@ -20,7 +20,7 @@ def order_create(request):
             for item in cart:
                 OrderItem.objects.create(order=order, product=item['product'], price=item['price'], quantity=item['quantity'])
             cart.clear()
-            return render(reauest, 'order/created.html',{'order':order})
+            return render(request, 'order/created.html',{'order':order})
     else:
         #주문자 정보를 입력받는 페이지
         form = OrderCreateForm()
@@ -39,7 +39,7 @@ from django.http import JsonResponse
 class OrderCreateAjaxView(View):
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsoneResponse({"authenticated":False}, status=403)
+            return JsonResponse({"authenticated":False}, status=403)
 
         cart = Cart(request)
         form = OrderCreateForm(request.POST)

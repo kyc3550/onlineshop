@@ -21,15 +21,14 @@ def add(request, product_id):
 
 def remove(request, product_id):
     cart = Cart(request)
-    product=get_object_or_404(Product, id=product_id)
+    product = get_object_or_404(Product, id=product_id)
     cart.remove(product)
     return redirect('cart:detail')
+
 
 def detail(request):
     cart = Cart(request)
     add_coupon = AddCouponForm()
     for product in cart:
-        product['quantity_form']=AddProductForm(initial={'quantity':product['quantity'],'is_update':True})
-
-    return render(request, 'cart/detail.html', {'cart':cart,
-                                                'add_coupon':add_coupon})
+        product['quantity_form'] = AddProductForm(initial={'quantity':product['quantity'], 'is_update':True})
+    return render(request, 'cart/detail.html', {'cart':cart, 'add_coupon':add_coupon})
